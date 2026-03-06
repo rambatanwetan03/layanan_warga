@@ -15,7 +15,7 @@ const App = () => {
     keterangan: 'RUTILAHU'
   });
 
-  // 1. Load data dari localStorage saat startup
+  // 1. Ambil data dari penyimpanan lokal saat aplikasi dibuka
   useEffect(() => {
     const savedData = localStorage.getItem('agenda_rambatan_wetan');
     if (savedData) {
@@ -23,7 +23,7 @@ const App = () => {
     }
   }, []);
 
-  // 2. Auto-save ke localStorage (Notif hanya muncul saat ada perubahan data nyata)
+  // 2. Simpan otomatis setiap ada perubahan data
   useEffect(() => {
     localStorage.setItem('agenda_rambatan_wetan', JSON.stringify(agendas));
     
@@ -49,14 +49,16 @@ const App = () => {
     }
 
     if (isEditing) {
+      // Logika untuk Update data lama
       setAgendas(agendas.map(item => item.id === isEditing ? { ...formData, id: isEditing } : item));
       setIsEditing(null);
     } else {
+      // Logika untuk Tambah data baru
       const newAgenda = { id: Date.now(), ...formData };
       setAgendas([...agendas, newAgenda]);
     }
 
-    // Reset Form
+    // Reset Form ke awal
     setFormData({
       hariTanggal: '',
       waktu: '',
@@ -84,12 +86,12 @@ const App = () => {
   };
 
   const deleteAgenda = (id) => {
-    if (window.confirm("Hapus data agenda ini?")) {
+    if (window.confirm("Apakah Anda yakin ingin menghapus data agenda ini?")) {
       setAgendas(agendas.filter(item => item.id !== id));
     }
   };
 
-  // 3. Fungsi Ekspor Excel (CSV) dengan perbaikan format Excel
+  // 3. Fungsi Ekspor ke format Excel (CSV)
   const exportToCSV = () => {
     if (agendas.length === 0) return alert("Tidak ada data untuk diekspor.");
     
@@ -116,7 +118,7 @@ const App = () => {
     document.body.removeChild(link);
   };
 
-  // 4. Helper Format Tanggal Indonesia
+  // 4. Format Tanggal ke Bahasa Indonesia (Contoh: Senin, 6 Maret 2026)
   const formatTanggalIndo = (dateStr) => {
     if (!dateStr) return '-';
     try {
@@ -132,20 +134,20 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900">
       
-      {/* HEADER RESMI (KOP SURAT) */}
+      {/* KOP SURAT RESMI */}
       <div className="max-w-6xl mx-auto mb-8 text-center border-b-4 border-double border-black pb-4 print:mb-2">
-        <h2 className="text-lg md:text-xl font-bold uppercase leading-tight">Pemerintah Kabupaten Indramayu</h2>
-        <h2 className="text-lg md:text-xl font-bold uppercase leading-tight">Kecamatan Sindang</h2>
-        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter my-2">
+        <h2 className="text-lg md:text-xl font-bold uppercase leading-tight text-black">Pemerintah Kabupaten Indramayu</h2>
+        <h2 className="text-lg md:text-xl font-bold uppercase leading-tight text-black">Kecamatan Sindang</h2>
+        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter my-2 text-black">
           Desa Rambatan Wetan
         </h1>
-        <p className="text-xs italic hidden print:block">Alamat: Jl. Raya Rambatan Wetan No. 01, Kec. Sindang, Indramayu 45221</p>
+        <p className="text-xs italic hidden print:block text-black">Alamat: Jl. Raya Rambatan Wetan No. 01, Kec. Sindang, Indramayu 45221</p>
         <div className="mt-6 border-t-2 border-black pt-2">
-          <h3 className="text-2xl font-bold underline decoration-1 underline-offset-4 tracking-widest">AGENDA PELAYANAN MASYARAKAT</h3>
+          <h3 className="text-2xl font-bold underline decoration-1 underline-offset-4 tracking-widest text-black uppercase">AGENDA PELAYANAN MASYARAKAT</h3>
         </div>
       </div>
 
-      {/* FORM INPUT (HIDDEN SAAT PRINT) */}
+      {/* PANEL INPUT (Sembunyi saat cetak) */}
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl mb-8 print:hidden border border-slate-200">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold flex items-center gap-2 text-indigo-700">
@@ -178,7 +180,7 @@ const App = () => {
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs font-black text-slate-400 uppercase tracking-wider">Kategori</label>
-            <select name="keterangan" value={formData.keterangan} onChange={handleInputChange} className="p-3 border-2 border-slate-100 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all font-bold text-indigo-900">
+            <select name="keterangan" value={formData.keterangan} onChange={handleInputChange} className="p-3 border-2 border-slate-100 rounded-xl focus:border-indigo-500 outline-none bg-white transition-all font-bold text-indigo-900 cursor-pointer">
               <option value="RUTILAHU">RUTILAHU</option>
               <option value="ODGJ">ODGJ</option>
               <option value="WARGA SAKIT">WARGA SAKIT</option>
@@ -188,30 +190,30 @@ const App = () => {
           <div className="flex items-end">
             <button type="submit" className={`w-full ${isEditing ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95`}>
               {isEditing ? <Save size={20} /> : <Plus size={20} />} 
-              {isEditing ? 'Update Agenda' : 'Simpan ke Daftar'}
+              {isEditing ? 'Simpan Update' : 'Tambahkan Agenda'}
             </button>
           </div>
         </form>
       </div>
 
-      {/* TOOLBAR AKSI (HIDDEN SAAT PRINT) */}
+      {/* TOMBOL AKSI (Sembunyi saat cetak) */}
       <div className="max-w-6xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
-        <div className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full transition-all duration-500 shadow-inner ${showSavedStatus ? 'bg-emerald-100 text-emerald-700' : 'bg-white text-slate-400 border border-slate-200'}`}>
+        <div className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full transition-all duration-500 shadow-inner ${showSavedStatus ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-white text-slate-400 border border-slate-200'}`}>
           {showSavedStatus ? <CheckCircle size={18} className="animate-pulse" /> : <Save size={18} />}
-          {showSavedStatus ? 'Data Tersimpan Otomatis!' : 'Data Tersimpan di Browser'}
+          {showSavedStatus ? 'Berhasil Disimpan!' : 'Status: Siap Simpan'}
         </div>
         
         <div className="flex gap-3">
-          <button onClick={exportToCSV} className="bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all font-bold shadow-sm">
-            <Download size={20} /> Ekspor Excel
+          <button onClick={exportToCSV} className="bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all font-bold shadow-sm active:scale-95">
+            <Download size={20} /> Simpan ke Excel
           </button>
-          <button onClick={() => window.print()} className="bg-slate-900 hover:bg-black text-white px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-xl font-bold">
-            <Printer size={20} /> Cetak Agenda (A4)
+          <button onClick={() => window.print()} className="bg-slate-900 hover:bg-black text-white px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-xl font-bold active:scale-95">
+            <Printer size={20} /> Cetak (A4 Landscape)
           </button>
         </div>
       </div>
 
-      {/* TABEL DATA UTAMA */}
+      {/* TABEL DATA */}
       <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden print:shadow-none border border-slate-200">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
@@ -247,11 +249,11 @@ const App = () => {
                     </td>
                     <td className="p-4 border border-slate-200 text-center print:hidden">
                       <div className="flex justify-center gap-2">
-                        <button onClick={() => startEdit(item)} className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-all" title="Edit">
-                          <Edit3 size={20} />
+                        <button onClick={() => startEdit(item)} className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-all" title="Ubah">
+                          <Edit3 size={18} />
                         </button>
                         <button onClick={() => deleteAgenda(item.id)} className="p-2 text-rose-600 hover:bg-rose-100 rounded-lg transition-all" title="Hapus">
-                          <Trash2 size={20} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
@@ -261,7 +263,7 @@ const App = () => {
                 <tr>
                   <td colSpan="7" className="p-24 text-center text-slate-300 font-medium bg-white italic border border-slate-100">
                     <FileText size={48} className="mx-auto mb-3 opacity-20" />
-                    Belum ada agenda terdaftar.
+                    Belum ada data agenda. Silakan isi form di atas.
                   </td>
                 </tr>
               )}
@@ -270,11 +272,11 @@ const App = () => {
         </div>
       </div>
 
-      {/* FOOTER PENGESAHAN (ONLY FOR PRINT) */}
-      <div className="hidden print:block max-w-6xl mx-auto mt-16">
+      {/* TANDA TANGAN (Hanya muncul saat cetak) */}
+      <div className="hidden print:block max-w-6xl mx-auto mt-16 text-black">
         <div className="grid grid-cols-2 gap-24 text-center font-bold">
           <div className="flex flex-col items-center">
-            <p className="mb-24">Mengetahui,</p>
+            <p className="mb-24 uppercase">Mengetahui,</p>
             <p className="uppercase border-b-2 border-black pb-1 w-64">Kepala Desa Rambatan Wetan</p>
           </div>
           <div className="flex flex-col items-center">
@@ -284,15 +286,22 @@ const App = () => {
         </div>
       </div>
 
-      {/* PRINT STYLING */}
+      {/* PENGATURAN HALAMAN CETAK */}
       <style>{`
         @media print {
-          @page { size: A4 landscape; margin: 12mm; }
-          body { background: white !important; font-size: 10pt; }
+          @page { 
+            size: A4 landscape; 
+            margin: 10mm; 
+          }
+          body { 
+            background: white !important; 
+            font-size: 10pt !important;
+            color: black !important;
+          }
           .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
           thead { display: table-header-group !important; }
           tr { page-break-inside: avoid !important; }
-          th, td { border: 1px solid black !important; padding: 6px !important; }
+          th, td { border: 1px solid black !important; padding: 6px !important; color: black !important; }
           .print\\:hidden { display: none !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
